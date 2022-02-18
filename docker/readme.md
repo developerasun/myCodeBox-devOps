@@ -1,5 +1,7 @@
 # Learning Docker essetials
 ## What is docker? 
+- Dockerfile ====(define docker image)====> Docker container(an instance of the image) ====> Docker CLI(based on image)
+
 > Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly.
 
 > Docker provides the ability to package and run an application in a loosely isolated environment called a container. The isolation and security allow you to run many containers simultaneously on a given host. 
@@ -34,23 +36,69 @@ Install docker desktop [here](https://hub.docker.com/editions/community/docker-c
 
 > When you use the docker pull or docker run commands, the required images are pulled from your configured registry. When you use the docker push command, your image is pushed to your configured registry.
 
-## Container
-> A container is a runnable instance of an image.
+## Images
+> An image is a **read-only template with instructions for creating a Docker container**. Often, an image is based on another image, with some additional customization. For example, you may build an image which is based on the ubuntu image, but installs the Apache web server and your application, as well as the configuration details needed to make your application run.
 
-> By default, a container is relatively well isolated from other containers and its host machine. You can control how isolated a container’s network, storage, or other underlying subsystems are from other containers or from the host machine.
+<img src="reference/docker-image-layer.png" width=483 height=305 alt="" />
+
+You can download a pre-made image(parent image) in [docker hub](https://hub.docker.com/). For example, download an official Node js image [here](https://hub.docker.com/_/node) with below command. 
+
+```shell
+$docker pull node
+```
+
+> You might create your own images or you might only use those created by others and published in a registry. **To build your own image, you create a Dockerfile** with a simple syntax for defining the steps needed to create the image and run it. Each instruction in a Dockerfile creates a layer in the image. 
+
+> When you change the Dockerfile and rebuild the image, only those layers which have changed are rebuilt. This is part of what asmakes images so lightweight, small, and fast, when compared to other virtualization technologies.
+
+### Container
+> A container is **a runnable instance of an image**.
+
+> What is a container? Simply put, a container is a sandboxed process on your machine that is isolated from all other processes on the host machine. That isolation leverages kernel namespaces and cgroups, features that have been in Linux for a long time. Docker has worked to make these capabilities approachable and easy to use. 
 
 > A container is defined by its image as well as any configuration options you provide to it when you create or start it. When a container is removed, any changes to its state that are not stored in persistent storage disappear.
 
-> Containers are lightweight and contain everything needed to run the application, so you do not need to rely on what is currently installed on the host. You can easily share containers while you work, and be sure that everyone you share with gets the same container that works in the same way.
 
-> Now that you’ve run a container, what is a container? Simply put, a container is a sandboxed process on your machine that is isolated from all other processes on the host machine. That isolation leverages kernel namespaces and cgroups, features that have been in Linux for a long time. Docker has worked to make these capabilities approachable and easy to use. 
+## Dockerfile
+Create a Dockerfile to set an image. 
 
-### Images
-> An image is a read-only template with instructions for creating a Docker container. Often, an image is based on another image, with some additional customization. For example, you may build an image which is based on the ubuntu image, but installs the Apache web server and your application, as well as the configuration details needed to make your application run.
+```dockerfile
+# FROM : Set the baseImage to use for subsequent instructions. 
+# FROM must be the first instruction in a Dockerfile.
+FROM node:17-alpine
 
-> You might create your own images or you might only use those created by others and published in a registry. To build your own image, you create a Dockerfile with a simple syntax for defining the steps needed to create the image and run it. Each instruction in a Dockerfile creates a layer in the image. 
+# Set the working directory for any subsequent ADD, COPY, CMD, 
+# ENTRYPOINT, or RUN instructions that follow it in the Dockerfile
+WORKDIR /app
 
-> When you change the Dockerfile and rebuild the image, only those layers which have changed are rebuilt. This is part of what makes images so lightweight, small, and fast, when compared to other virtualization technologies.
+# COPY : Copy files or folders from source 
+# to the dest path in the image's filesystem.
+# Note that copy directory is relative to WORKDIR above. 
+COPY . .
+
+# Execute any commands on top of the current image 
+# as a new layer and commit the results.
+RUN npm install 
+
+# Define the network ports that this container will listen on at runtime.
+EXPOSE 4000
+
+# Provide defaults for an executing container. 
+# If an executable is not specified, then ENTRYPOINT must be specified as well. 
+# There can only be one CMD instruction in a Dockerfile.
+CMD ["node", "app.js"]
+```
+
+Once all done, build the image. 
+
+```shell
+# -t : name tag for images
+# . : relative path for dockerfile in the project
+$docker build -t myapp .
+```
+
+Docker desktop will display the image if build was successful. 
+
 
 ## Behind the scence
 > Docker is written in the Go programming language and takes advantage of several features of the Linux kernel to deliver its functionality. 
