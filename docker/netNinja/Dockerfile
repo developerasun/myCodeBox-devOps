@@ -2,6 +2,8 @@
 # FROM must be the first instruction in a Dockerfile.
 FROM node:17-alpine
 
+RUN npm install -g nodemon
+
 # Set the working directory for any subsequent ADD, COPY, CMD, 
 # ENTRYPOINT, or RUN instructions that follow it in the Dockerfile
 WORKDIR /app
@@ -23,4 +25,4 @@ EXPOSE 4000
 # Provide defaults for an executing container. 
 # If an executable is not specified, then ENTRYPOINT must be specified as well. 
 # There can only be one CMD instruction in a Dockerfile.
-CMD ["node", "app.js"]
+CMD ["npm", "run", "dev"]
