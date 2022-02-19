@@ -9,11 +9,13 @@ WORKDIR /app
 # COPY : Copy files or folders from source 
 # to the dest path in the image's filesystem.
 # Note that copy directory is relative to WORKDIR above. 
-COPY . .
+COPY package.json .
 
 # Execute any commands on top of the current image 
 # as a new layer and commit the results.
 RUN npm install 
+
+COPY . .
 
 # Define the network ports that this container will listen on at runtime.
 EXPOSE 4000
