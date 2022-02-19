@@ -85,7 +85,8 @@ Once all done, build the image.
 ```shell
 # -t : name tag for images
 # . : relative path for dockerfile in the project
-$docker build -t myapp .
+# myapp:test  : name the image with tag 'test'. The tag can be useful to track version.
+$docker build -t myapp:test .
 ```
 
 Docker desktop will display the image if build was successful. You can run an image intance, meaning container. 
@@ -154,6 +155,8 @@ $docker start (container-name)
 
 > Starting with a parent image that is already in the cache, the next instruction is compared against all child images derived from that base image to see if one of them was built using the exact same instruction. If not, the cache is invalidated.
 
+<img src="reference/docker-layer-cache.png" width=900 height=406 alt="docker build layer cache" />
+
 > In most cases, simply comparing the instruction in the Dockerfile with one of the child images is sufficient. However, certain instructions require more examination and explanation.
 
 > For the ADD and COPY instructions, the contents of the file(s) in the image are examined and a checksum is calculated for each file. The last-modified and last-accessed times of the file(s) are not considered in these checksums. During the cache lookup, the checksum is compared against the checksum in the existing images. If anything has changed in the file(s), such as the contents and metadata, then the cache is invalidated.
@@ -172,18 +175,36 @@ temp?
 
 > The CLI interprets the .dockerignore file as a newline-separated list of patterns similar to the file globs of Unix shells. For the purposes of matching, the root of the context is considered to be both the working and the root directory. 
 
+## Managing image and container
+### Deleting
+1. check a current image list
 
+```shell
+$docker images
+```
+
+1. check current running processes(containers). 
+
+```shell
+$docker ps
+```
+
+1. delete image you want to delete. Note that you can't delete the image if a container is using the image.
+
+```shell
+$docker image rm (image-name)
+```
+
+Instead you can try to remove the container first and then remove the image. 
+
+```shell
+$docker container rm (container-name)
+$docker image rm (image-name)
+```
 
 ## API reference
-
 List of basic Docker API is as follows : 
-
-1. 
-1. 
-1. 
-1. 
-1. 
-
+content will be added
 
 ## Behind the scence
 
