@@ -10,6 +10,16 @@
 Install docker desktop [here](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
 >  Docker Desktop includes the Docker daemon (dockerd), the Docker client (docker), Docker Compose, Docker Content Trust, Kubernetes, and Credential Helper.
 
+### Version check
+Run below command to check your docker version. 
+
+```shell
+$docker version
+```
+
+<img src="reference/docker-client-server-version.png" width=745 height=613 alt="docker version check" />
+
+
 ## What can I use Docker for?
 > Docker streamlines the development lifecycle **by allowing developers to work in standardized environments** using local containers which provide your applications and services. Containers are great for continuous integration and continuous delivery (CI/CD) workflows.
 
@@ -202,6 +212,18 @@ $docker container rm (container-name)
 $docker image rm (image-name)
 ```
 
+If you want to delete all the images and containers, use dokcer system command. 
+
+```shell
+$docker system prune
+```
+
+This will remove:
+- all stopped containers
+- all networks not used by at least one container
+- all dangling images
+- all dangling build cache
+
 ## Volume
 Once docker image is created with docker build command, the image becomes read-only. If changes have been made, the image needs to be re-built to reflect the update. However, that will be some another tedius task to do if it needs to be done every time we changes some source codes. 
 
@@ -217,6 +239,110 @@ This is where volume comes into play. To simply put, volume is to map your direc
 
 > volumes are often a better choice than persisting data in a container’s writable layer, because a volume does not increase the size of the containers using it, and the volume’s contents exist outside the lifecycle of a given container.
 
+## Docker compose
+- Several Dockerfiles <====> docker-compose.yml
+
+> Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. 
+
+> Compose works in all environments: production, staging, development, testing, as well as CI workflows.
+
+Using Compose is basically a three-step process:
+1. Define your app’s environment with a Dockerfile so it can be reproduced anywhere.
+1. Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
+1. Run docker compose up and the Docker compose command starts and runs your entire app. You can alternatively run docker-compose up using the docker-compose binary.
+
+```yaml
+version: '3.9'
+services:
+  net-ninja :
+    # build lets docker compose know where Dockerfile is
+    build : ./
+    # set a running container name
+    container_name: netNinja_compose
+    # port mapping for localhost and container
+    ports:
+      - '4000:4000'
+    # directory mapping for localhost and container
+    volumes:
+      - ./:/app
+      - /app/node_modules
+  react-docker: 
+    build : ./react-docker
+    container_name: react-docker_compose
+    ports:
+      - '3000:3000'
+    # make docker interactive mode(opposite of detach flag)
+    stdin_open: true 
+    tty: true
+```
+
+### Multiple isolated environments on a single host
+> Compose uses a project name to isolate environments from each other. You can make use of this project name in several different contexts:
+
+> The default project name is the basename of the project directory. You can set a custom project name by using the -p command line option or the COMPOSE_PROJECT_NAME environment variable.
+
+> The default project directory is the base directory of the Compose file. A custom value for it can be defined with the --project-directory command line option.
+
+> Compose supports variables in the Compose file. You can use these variables to customize your composition for different environments, or different users
+
+### Running docker-compose
+Run docker-compose where a docker-compose.yml file is.
+
+```shell
+$docker-compose up
+```
+
+Then your application will run as several dockerfiles configured. Stop docker-compose running with below command. 
+
+```shell
+$docker-compose down
+$docker-compose down --rmi all -v # down docker-compose and delete created images/volume created by docker-compose.
+```
+
+## Docker hub
+Login to Docker hub with docker login command. 
+
+```shell
+$docker login
+```
+
+Push your docker image to docker hub with below command. 
+
+```shell
+$docker push (docker hub repo name):(tag name)
+```
+
+Pull your docker image from docker hub with below command. 
+
+```shell
+$docker pull (docker hub repo name):(tag name)
+```
+
+Note with Docker daemon will throw unknow manifest error during pulling if you do not provide a tag. 
+
+### Change local repo name
+Note that remote docker repository name should be the same with local image repository name for pushing to succeed. 
+
+<img src="reference/docker-remote-repository.png" width=375 height=304 alt="docker hub remote repo name" />
+
+Above docker hub remote repository name is the same with
+
+<img src="reference/docker-local-images-repository.png" width=800 height=200 alt="docker local repo name" />
+
+local image repository name in host computer. 
+
+1. run docker images command to check local repo name
+
+```shell 
+$docker images
+```
+
+1. change the local repo name with below command
+```shell
+$docker tag (name):(tag) (new name):(new tag)
+```
+
+
 ## API reference
 List of basic Docker API is as follows : 
 content will be added
@@ -224,13 +350,12 @@ content will be added
 ## Behind the scence
 > Docker is written in the Go programming language and takes advantage of several features of the Linux kernel to deliver its functionality.
 > Docker uses a technology called namespaces to provide the isolated workspace called the container. When you run a container, Docker creates a set of namespaces for that container.
-
 > These namespaces provide a layer of isolation. Each aspect of a container runs in a separate namespace and its access is limited to that namespace.
 
 
 
 ## Reference
-
 - [Docker official docs](https://docs.docker.com/get-started/)
 - [Docker crash course - Net Ninja](https://youtube.com/playlist?list=PL4cUxeGkcC9hxjeEtdHFNYMtCpjNBm3h7)
 - [Docker : .dockerignore file](https://docs.docker.com/engine/reference/builder/#dockerignore-file)
+- [Docker : overview of docker compose](https://docs.docker.com/compose/)
