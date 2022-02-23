@@ -63,6 +63,8 @@ $docker pull node
 ### Dockerfile
 Create a Dockerfile to set an image.
 
+> Please check that the file Dockerfile has no file extension like .txt. Some editors may append this file extension automatically and this would result in an error in the next step.
+
 ```dockerfile
 # FROM : Set the baseImage to use for subsequent instructions. 
 # FROM must be the first instruction in a Dockerfile.
@@ -184,6 +186,13 @@ temp?
 ```
 
 > The CLI interprets the .dockerignore file as a newline-separated list of patterns similar to the file globs of Unix shells. For the purposes of matching, the root of the context is considered to be both the working and the root directory. 
+
+## Flags
+Types of flags in docker command is as follows : 
+
+1. -d : run the container in detached mode (in the background)
+1. -p : map host port to container port
+1. -t : name an image during build
 
 ## Managing image and container
 ### Deleting
@@ -342,6 +351,44 @@ $docker images
 $docker tag (name):(tag) (new name):(new tag)
 ```
 
+## Persist DB
+> In case you didn’t notice, our todo list is being wiped clean every single time we launch the container. Why is this? Let’s dive into how the container is working.
+
+> The container’s filesystem : When a container runs, it uses the various layers from an image for its filesystem. Each container also gets its own “scratch space” to create/update/remove files. Any changes won’t be seen in another container, even if they are using the same image.
+
+### Container volumns
+> With the previous experiment, we saw that each container starts from the image definition each time it starts. While containers can create, update, and delete files, those changes are lost when the container is removed and all changes are isolated to that container. With volumes, we can change all of this.
+
+> Volumes provide the ability to connect specific filesystem paths of the container back to the host machine. If a directory in the container is mounted, changes in that directory are also seen on the host machine. If we mount that same directory across container restarts, we’d see the same files.
+
+> There are two main types of volumes. We will eventually use both, but we will start with named volumes.
+
+> By creating a volume and attaching (often called “mounting”) it to the directory the data is stored in, we can persist the data. As our container writes to the todo.db file, it will be persisted to the host in the volume.
+
+> As mentioned, we are going to use a named volume. Think of a named volume as simply a bucket of data. Docker maintains the physical location on the disk and you only need to remember the name of the volume. Every time you use the volume, Docker will make sure the correct data is provided. 
+
+Run below command to mount(attach) a volume. 
+
+```shell
+# volume creation : docker volume create <volumn name>
+$docker volume create todo-db
+```
+
+Specify volume mount with -v flag. The volumn is attached(mounted) to /etc/todos directory in host machine. This directory will caputre all files created at the path. 
+
+```shell
+# -v : (volume name):(host machine directory to save the files)
+$docker run -dp 3000:3000 -v todo-db:/etc/todos getting-started
+```
+
+### Inspect the volumns
+> The Mountpoint is the actual location on the disk where the data is stored. Note that on most machines, you will need to have root access to access this directory from the host. But, that’s where it is!
+
+<img src="reference/docker-inspect-mountpoint.png" width=677 height=328 alt="checking docker mountpoint" />
+
+> A lot of people frequently ask “Where is Docker actually storing my data when I use a named volume?” If you want to know, you can use the docker volume inspect command.
+
+> Accessing volume data directly on Docker Desktop : While running in Docker Desktop, the Docker commands are actually running inside a small VM on your machine. If you wanted to look at the actual contents of the Mountpoint directory, you would need to first get inside of the VM.
 
 ## API reference
 List of basic Docker API is as follows : 
@@ -359,3 +406,4 @@ content will be added
 - [Docker crash course - Net Ninja](https://youtube.com/playlist?list=PL4cUxeGkcC9hxjeEtdHFNYMtCpjNBm3h7)
 - [Docker : .dockerignore file](https://docs.docker.com/engine/reference/builder/#dockerignore-file)
 - [Docker : overview of docker compose](https://docs.docker.com/compose/)
+- [Docker : persist the DB](https://docs.docker.com/get-started/05_persisting_data/)
