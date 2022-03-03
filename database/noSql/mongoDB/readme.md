@@ -1,4 +1,187 @@
 # Learning MongoDB essentials 
+## Basics
+> MongoDB is a document database designed for ease of development and scaling
+
+> A record in MongoDB is a document, which is a data structure composed of field and value pairs. MongoDB documents are similar to JSON objects. The values of fields may include other documents, arrays, and arrays of documents.
+
+> MongoDB stores documents in collections. Collections are analogous to tables in relational databases.
+
+> The advantages of using documents are:
+
+1. Documents (i.e. objects) correspond to native data types in many programming languages.
+1. Embedded documents and arrays reduce need for expensive joins.
+1. Dynamic schema supports fluent polymorphism.
+
+### Why MongoDB
+> High performance : Support for embedded data models reduces I/O activity on database system. Indexes support faster queries and can include keys from embedded documents and arrays.
+
+> Rich query language : MongoDB supports a rich query language to support read and write operations (CRUD) as well as: Data Aggregation, Text Search and Geospatial Queries.
+
+> High Availability : MongoDB's replication facility, called replica set, provides: 1) automatic failover 2) data redundancy. A replica set is a group of MongoDB servers that maintain the same data set, providing redundancy and increasing data availability.
+
+> Horizontal Scalability : MongoDB provides horizontal scalability as part of its core functionality: 1) Sharding distributes data across a cluster of machines. 2) Starting in 3.4, MongoDB supports creating zones of data based on the shard key. In a balanced cluster, MongoDB directs reads and writes covered by a zone only to those shards inside the zone. See the Zones manual page for more information.
+
+### Getting started
+Visit [this website](https://docs.mongodb.com/manual/tutorial/getting-started/) to get an interactive MongoDB shell. 
+
+#### Switch database
+> Within the shell, db refers to your current database. Type db to display the current database.
+
+```shell
+$db
+```
+
+> To switch databases, type use <db>. For example, to switch to the examples database:
+
+```shell
+$use examples
+```
+
+> You do not need to create the database before you switch. MongoDB creates the database when you first store data in that database (such as create the first collection in the database).
+
+#### Insert data
+> MongoDB stores documents in collections. Collections are analogous to tables in relational databases
+> If a collection does not exist, MongoDB creates the collection when 
+you first store data for that collection.
+
+```js 
+db.movies.insertMany([
+   {
+      title: 'Titanic',
+      year: 1997,
+      genres: [ 'Drama', 'Romance' ],
+      rated: 'PG-13',
+      languages: [ 'English', 'French', 'German', 'Swedish', 'Italian', 'Russian' ],
+      released: ISODate("1997-12-19T00:00:00.000Z"),
+      awards: {
+         wins: 127,
+         nominations: 63,
+         text: 'Won 11 Oscars. Another 116 wins & 63 nominations.'
+      },
+      cast: [ 'Leonardo DiCaprio', 'Kate Winslet', 'Billy Zane', 'Kathy Bates' ],
+      directors: [ 'James Cameron' ]
+   },
+   {
+      title: 'The Dark Knight',
+      year: 2008,
+      genres: [ 'Action', 'Crime', 'Drama' ],
+      rated: 'PG-13',
+      languages: [ 'English', 'Mandarin' ],
+      released: ISODate("2008-07-18T00:00:00.000Z"),
+      awards: {
+         wins: 144,
+         nominations: 106,
+         text: 'Won 2 Oscars. Another 142 wins & 106 nominations.'
+      },
+      cast: [ 'Christian Bale', 'Heath Ledger', 'Aaron Eckhart', 'Michael Caine' ],
+      directors: [ 'Christopher Nolan' ]
+   },
+   {
+      title: 'Spirited Away',
+      year: 2001,
+      genres: [ 'Animation', 'Adventure', 'Family' ],
+      rated: 'PG',
+      languages: [ 'Japanese' ],
+      released: ISODate("2003-03-28T00:00:00.000Z"),
+      awards: {
+         wins: 52,
+         nominations: 22,
+         text: 'Won 1 Oscar. Another 51 wins & 22 nominations.'
+      },
+      cast: [ 'Rumi Hiiragi', 'Miyu Irino', 'Mari Natsuki', 'Takashi Naitè' ],
+      directors: [ 'Hayao Miyazaki' ]
+   },
+   {
+      title: 'Casablanca',
+      genres: [ 'Drama', 'Romance', 'War' ],
+      rated: 'PG',
+      cast: [ 'Humphrey Bogart', 'Ingrid Bergman', 'Paul Henreid', 'Claude Rains' ],
+      languages: [ 'English', 'French', 'German', 'Italian' ],
+      released: ISODate("1943-01-23T00:00:00.000Z"),
+      directors: [ 'Michael Curtiz' ],
+      awards: {
+         wins: 9,
+         nominations: 6,
+         text: 'Won 3 Oscars. Another 6 wins & 6 nominations.'
+      },
+      lastupdated: '2015-09-04 00:22:54.600000000',
+      year: 1942
+   }
+])
+```
+
+> The operation returns a document that contains the acknowledgement indicator and an array that contains the _id of each successfully inserted documents.
+
+#### Find all data
+To verify the insert, you can query the collection.
+```js
+db.movies.find( { } )
+```
+
+#### Filter data
+> For an equality match (<field> equals <value>), specify <field>: <value> in the query filter document and pass to the db.collection.find() method.
+
+```js 
+// note that field is string
+db.movies.find( { "directors": "Christopher Nolan" } );
+```
+
+#### Comparison query operator
+MongoDB provides various query operators. 
+
+1. $eq : Matches values that are equal to a specified value.
+1. $gt : Matches values that are greater than a specified value.
+1. $gte : Matches values that are greater than or equal to a specified value.
+1. $in : Matches any of the values specified in an array.
+1. $lt : Matches values that are less than a specified value.
+
+```js
+db.movies.find( { "awards.win" : {$lt : 150} } )
+```
+
+1. $lte : Matches values that are less than or equal to a specified value.
+1. $ne : Matches all values that are not equal to a specified value.
+1. $nin : Matches none of the values specified in an array.
+
+## Documents
+> MongoDB stores data records as BSON documents. BSON is a binary representation of JSON documents, though it contains more data types than JSON.
+
+> BSON documents may have more than one field with the same name. Most MongoDB interfaces, however, represent MongoDB with a structure (e.g. a hash table) that does not support duplicate field names. If you need to manipulate documents that have more than one field with the same name, see the driver documentation for your driver.
+
+### Document size limit
+> The maximum BSON document size is 16 megabytes. The maximum document size helps ensure that a single document cannot use excessive amount of RAM or, during transmission, excessive amount of bandwidth. To store documents larger than the maximum size, MongoDB provides the GridFS API. 
+
+### Document field order
+> Unlike JavaScript objects, the fields in a BSON document are ordered.
+> When comparing documents, field ordering is significant. For example, when comparing documents with fields a and b in a query:
+
+```js
+{a: 1, b: 1} // is equal to {a: 1, b: 1}
+{a: 1, b: 1} // is not equal to {b: 1, a: 1}
+```
+
+> For efficient query execution, the query engine may reorder fields during query processing. Among other cases, reordering fields may occur when processing these projection operators: $project, $addFields, $set, and $unset.
+
+> Field reordering may occur in intermediate results as well as the final results returned by a query. Because some operations may reorder fields, you should not rely on specific field ordering in the results returned by a query that uses the projection operators listed earlier.
+
+> The _id field is always the first field in the document. Updates that include renaming of field names may result in the reordering of fields in the document.
+
+### The _id field
+> In MongoDB, each document stored in a collection requires a unique _id field that acts as a primary key. If an inserted document omits the _id field, the MongoDB driver automatically generates an ObjectId for the _id field.
+
+> By default, MongoDB creates a unique index on the _id field during the creation of a collection.
+
+> The _id field is always the first field in the documents. If the server receives a document that does not have the _id field first, then the server will move the field to the beginning.
+
+>  If the _id contains subfields, the subfield names cannot begin
+with a ($) symbol.
+
+> The _id field may contain values of any BSON data type, other than an array, regex, or undefined.
+
+> Most MongoDB driver clients will include the _id field and generate an ObjectId before sending the insert operation to MongoDB; however, if the client sends a document without an _id field, the mongod will add the _id field and generate the ObjectId.
+
+
+## Learning by doing
 Took below courses and summarized essentials. 
 
 - [NetNinja - MongoDB for beginners](https://www.youtube.com/playlist?list=PL4cUxeGkcC9jpvoYriLI0bY8DOgWZfi6u)
@@ -26,14 +209,6 @@ MongoDB's format is JSON, which is Javascript Object Notation.
 - Web client : HTML, CSS, Javascript
 - Web server : Node.js/Express
 - Database : JSON, Mongoose
-
-## Table of Contents
-- [Installation]()
-- [Connection]()
-- [Schema, Collection, And Model]()
-- [Testing With Mocha]()
-- [Login and Hash]()
-- [Comparison With Relational Database]()
 
 ## Comparison With Relational Database
 ### Relational DB : SQL
@@ -299,4 +474,5 @@ When delivered
 - <img src="reference/mocha-test-async-success.png" width=740 height=530 />
 
 ## Reference
+- [MongoDB official manual](https://docs.mongodb.com/manual/introduction/)
 - [NetNinja - MongoDB for beginners](https://www.youtube.com/playlist?list=PL4cUxeGkcC9jpvoYriLI0bY8DOgWZfi6u)
