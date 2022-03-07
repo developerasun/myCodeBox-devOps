@@ -1,33 +1,17 @@
-# My Open Code Box - Backend
+# My Open Code Box - DevOps
 This is a open code box of Jake Sung, containing the sum of his blood, sweat, and tears. The list is as follows :  
 
 ## Inputs
 <details>
-<summary>database</summary>
-
-- video here 
-- video here 
-- video here 
-</details>
-
-<details>
-<summary>firebase</summary>
-
-- video here 
-- video here 
-- video here 
-</details>
-
-<details>
-<summary>netlify</summary>
-
-- video here 
-- video here 
-- video here 
-</details>
-
-<details>
 <summary>docker</summary>
+
+- video here 
+- video here 
+- video here 
+</details>
+
+<details>
+<summary>github action</summary>
 
 - video here 
 - video here 
