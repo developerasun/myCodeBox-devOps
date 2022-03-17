@@ -282,7 +282,7 @@ $docker run -v (volume name):(container-directory)
 > Compose works in all environments: production, staging, development, testing, as well as CI workflows.
 
 Using Compose is basically a three-step process:
-1. Define your app’s environment with a Dockerfile so it can be reproduced anywhere.
+1. Define your **app’s environment** with a Dockerfile so it can be **reproduced anywhere**.
 1. Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
 1. Run docker compose up and the Docker compose command starts and runs your entire app. You can alternatively run docker-compose up using the docker-compose binary.
 
@@ -299,8 +299,8 @@ services:
       - '4000:4000'
     # directory mapping for localhost and container
     volumes:
-      - ./:/app
-      - /app/node_modules
+      - ./:/app # named volume
+      - /app/node_modules # anonymous volume
   react-docker: 
     build : ./react-docker
     container_name: react-docker_compose
@@ -327,54 +327,11 @@ Run docker-compose where a docker-compose.yml file is.
 $docker-compose up
 ```
 
-Then your application will run as several dockerfiles configured. Stop docker-compose running with below command. 
+Then your application will run **as several dockerfiles configured**. Stop docker-compose running with below command. 
 
 ```shell
 $docker-compose down
 $docker-compose down --rmi all -v # down docker-compose and delete created images/volume created by docker-compose.
-```
-
-## Docker hub
-Login to Docker hub with docker login command. 
-
-```shell
-$docker login
-```
-
-Push your docker image to docker hub with below command. 
-
-```shell
-$docker push (docker hub repo name):(tag name)
-```
-
-Pull your docker image from docker hub with below command. 
-
-```shell
-$docker pull (docker hub repo name):(tag name)
-```
-
-Note with Docker daemon will throw unknow manifest error during pulling if you do not provide a tag. 
-
-### Change local repo name
-Note that remote docker repository name should be the same with local image repository name for pushing to succeed. 
-
-<img src="reference/docker-remote-repository.png" width=375 height=304 alt="docker hub remote repo name" />
-
-Above docker hub remote repository name is the same with
-
-<img src="reference/docker-local-images-repository.png" width=800 height=200 alt="docker local repo name" />
-
-local image repository name in host computer. 
-
-1. run docker images command to check local repo name
-
-```shell 
-$docker images
-```
-
-1. change the local repo name with below command
-```shell
-$docker tag (name):(tag) (new name):(new tag)
 ```
 
 ## Persist DB
@@ -416,16 +373,39 @@ $docker run -dp 3000:3000 -v todo-db:/etc/todos getting-started
 
 > Accessing volume data directly on Docker Desktop : While running in Docker Desktop, the Docker commands are actually running inside a small VM on your machine. If you wanted to look at the actual contents of the Mountpoint directory, you would need to first get inside of the VM.
 
-## API reference
-List of basic Docker API is as follows : 
-content will be added
-
 ## Behind the scence
 > Docker is written in the Go programming language and takes advantage of several features of the Linux kernel to deliver its functionality.
+
 > Docker uses a technology called namespaces to provide the isolated workspace called the container. When you run a container, Docker creates a set of namespaces for that container.
+
 > These namespaces provide a layer of isolation. Each aspect of a container runs in a separate namespace and its access is limited to that namespace.
 
+## Docker hub
+Login to Docker hub with docker login command. 
 
+```shell
+$docker login
+```
+
+Push your docker image to docker hub with below command. 
+
+```shell
+$docker push (docker hub username):(image name):(tag name)
+```
+
+For example, check docker image name and rename with tag command to sync with Docker hub remote repository.
+
+<img src="reference/docker-retagging.png" width=1000 height=200 alt="tagging docker image" />
+
+And then, push the image to Docker hub.
+
+<img src="reference/docker-push.png" width=1000 height=350 alt="pushing docker image" />
+
+Pull your docker image from docker hub with below command. 
+
+```shell
+$docker pull (docker hub username):(image name):(tag name)
+```
 
 ## Reference
 - [Docker official docs](https://docs.docker.com/get-started/)
