@@ -273,67 +273,6 @@ $docker run -v (volume name):(container-directory)
 
 <img src="reference/named-volume-in-docker-compose.png" width=640 height=398 alt="using named volume in container/docker compose level" />
 
-
-## Docker compose
-- Several Dockerfiles <====> docker-compose.yml
-
-> Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. 
-
-> Compose works in all environments: production, staging, development, testing, as well as CI workflows.
-
-Using Compose is basically a three-step process:
-1. Define your **app’s environment** with a Dockerfile so it can be **reproduced anywhere**.
-1. Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
-1. Run docker compose up and the Docker compose command starts and runs your entire app. You can alternatively run docker-compose up using the docker-compose binary.
-
-```yaml
-version: '3.9'
-services:
-  net-ninja :
-    # build lets docker compose know where Dockerfile is
-    build : ./
-    # set a running container name
-    container_name: netNinja_compose
-    # port mapping for localhost and container
-    ports:
-      - '4000:4000'
-    # directory mapping for localhost and container
-    volumes:
-      - ./:/app # named volume
-      - /app/node_modules # anonymous volume
-  react-docker: 
-    build : ./react-docker
-    container_name: react-docker_compose
-    ports:
-      - '3000:3000'
-    # make docker interactive mode(opposite of detach flag)
-    stdin_open: true 
-    tty: true
-```
-
-### Multiple isolated environments on a single host
-> Compose uses a project name to isolate environments from each other. You can make use of this project name in several different contexts:
-
-> The default project name is the basename of the project directory. You can set a custom project name by using the -p command line option or the COMPOSE_PROJECT_NAME environment variable.
-
-> The default project directory is the base directory of the Compose file. A custom value for it can be defined with the --project-directory command line option.
-
-> Compose supports variables in the Compose file. You can use these variables to customize your composition for different environments, or different users
-
-### Running docker-compose
-Run docker-compose where a docker-compose.yml file is.
-
-```shell
-$docker-compose up
-```
-
-Then your application will run **as several dockerfiles configured**. Stop docker-compose running with below command. 
-
-```shell
-$docker-compose down
-$docker-compose down --rmi all -v # down docker-compose and delete created images/volume created by docker-compose.
-```
-
 ## Persist DB
 > In case you didn’t notice, our todo list is being wiped clean every single time we launch the container. Why is this? Let’s dive into how the container is working.
 
