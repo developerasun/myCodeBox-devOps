@@ -157,3 +157,89 @@ services:
 
 > The new volumes key mounts the project directory (current directory) on the host to /code inside the container, allowing you to modify the code on the fly, without having to rebuild the image. The environment key sets the FLASK_ENV environment variable, which tells flask run to run in development mode and reload the code on change. This mode should only be used in development.
 
+## Service configuration reference
+
+> The Compose file is a YAML file defining services, networks and volumes. The default path for a Compose file is ./docker-compose.yml
+
+### build
+> Build is a configuration options that are applied at build time. build can be specified either as a string containing a path to the build context:
+
+```yaml
+version: "3.9"
+services:
+  webapp:
+    build: ./dir
+```
+
+> Or, as an object with the path specified under context and optionally Dockerfile and args:
+
+```yaml
+version: "3.9"
+services:
+  webapp:
+    build:
+      context: ./dir
+      dockerfile: Dockerfile-alternate
+      args:
+        buildno: 1
+```
+
+> If you specify image as well as build, then Compose names the built image with the webapp and optional tag specified in image:
+
+```yml
+build: ./dir
+image: webapp:tag
+```
+
+<details>
+<summary>dockerfile and args</summary>
+
+1. dockerfile : Alternate Dockerfile.
+
+> Compose uses an alternate file to build with. A build path must also be specified.
+
+```yml
+build:
+  context: .
+  dockerfile: Dockerfile-alternate
+```
+
+1. args : Add build arguments, which are environment variables accessible only during the build process. First, specify the arguments in your Dockerfile:
+
+```dockerfile
+# syntax=docker/dockerfile:1
+
+ARG buildno
+ARG gitcommithash
+
+RUN echo "Build number: $buildno"
+RUN echo "Based on commit: $gitcommithash"
+```
+
+> Then specify the arguments under the build key. You can pass a mapping or a list:
+
+```yml
+# mapping
+build:
+  context: .
+  args:
+    buildno: 1
+    gitcommithash: cdc3b19
+
+# list
+build:
+  context: .
+  args:
+    - buildno=1
+    - gitcommithash=cdc3b19
+```
+
+> You can omit the value when specifying a build argument, in which case its value at build time is the value in the environment where Compose is running.
+
+```yml
+args:
+  - buildno
+  - gitcommithash
+```
+
+</details>
